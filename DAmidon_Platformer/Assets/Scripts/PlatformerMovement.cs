@@ -1,6 +1,3 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class PlatformerMovement : MonoBehaviour
@@ -12,11 +9,16 @@ public class PlatformerMovement : MonoBehaviour
 
     [Header("Jump")]
     public float jumpForce;
+    public float timeBeforeNotGrounded;
+    float jumpCooldown = .05f;
+    bool readyToJump;
+    bool canJump;
+    float lastGrounded;
+
+    [Header("Ground Check")]
     public Transform castPos;
     public float castRadius;
     public LayerMask castMask;
-    float jumpCooldown = .05f;
-    bool readyToJump;
 
     [Header("Animation")]
     public SpriteRenderer sprite;
@@ -36,8 +38,9 @@ public class PlatformerMovement : MonoBehaviour
 
     void Update()
     {
+        CheckGrounded();
+
         vel = rb.velocity; //Set vel variable
-        animator.SetBool("Jumping", !IsGrounded()); //Set Animator "Jump" Status
 
         //Stop violent shaking
         if (Mathf.Abs(inputX) < threshold && Mathf.Abs(rb.velocity.x) < 0.5f)
@@ -46,19 +49,6 @@ public class PlatformerMovement : MonoBehaviour
         //Jump
         if (Input.GetButton("Jump"))
             Jump();
-    }
-
-    private void Jump()
-    {
-        if(IsGrounded() && readyToJump)
-        {
-            //Set Y-Velocity to zero as to have consistant jumps
-            rb.velocity = new Vector2(vel.x, 0);
-
-            readyToJump = false;
-            rb.AddForce(Vector2.up * jumpForce);
-            Invoke(nameof(ResetJump), jumpCooldown);
-        }
     }
 
     private void FixedUpdate()
@@ -83,14 +73,14 @@ public class PlatformerMovement : MonoBehaviour
             animator.SetBool("Moving", true);
         else animator.SetBool("Moving", false);
 
-        if(inputX == -1)
+        if (inputX == -1)
             sprite.flipX = true;
         else if (inputX == 1)
             sprite.flipX = false;
 
         //Calculate force
-        if (Mathf.Abs(vel.x) > maxSpeed) 
-            if(inputX == dir)
+        if (Mathf.Abs(vel.x) > maxSpeed)
+            if (inputX == dir)
                 inputX = 0; //If velocity is greater than max speed set to zero
 
         float forceToAdd = inputX * moveForce * Time.deltaTime;
@@ -102,7 +92,7 @@ public class PlatformerMovement : MonoBehaviour
 
     void CounterMove()
     {
-        if (!IsGrounded()) { return; }
+        if (!canJump) { return; }
 
         if (Mathf.Abs(inputX) < threshold && Mathf.Abs(rb.velocity.x) > threshold)
         {
@@ -112,13 +102,38 @@ public class PlatformerMovement : MonoBehaviour
         }
     }
 
-    bool IsGrounded()
+    private void Jump()
     {
-        return Physics2D.OverlapCircle(castPos.position, castRadius, castMask);
+        if(canJump && readyToJump)
+        {
+            //Set Y-Velocity to zero as to have consistant jumps
+            rb.velocity = new Vector2(vel.x, 0);
+
+            readyToJump = false;
+            rb.AddForce(Vector2.up * jumpForce);
+            Invoke(nameof(ResetJump), jumpCooldown);
+        }
     }
 
     void ResetJump()
     {
         readyToJump = true;
+    }
+
+    void CheckGrounded()
+    {
+        bool touchingGround = Physics2D.OverlapCircle(castPos.position, castRadius, castMask);
+        animator.SetBool("Jumping", !touchingGround); //Set Animator "Jump" Status
+
+        //This allows for the ability to jump a little after not touching ground
+        if (touchingGround)
+            lastGrounded = 0;
+        else lastGrounded += Time.deltaTime;
+
+        if(lastGrounded < timeBeforeNotGrounded)
+        {
+            canJump = true;
+        }
+        else canJump = false;
     }
 }
