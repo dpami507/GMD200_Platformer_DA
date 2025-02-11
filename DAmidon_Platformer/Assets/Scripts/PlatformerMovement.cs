@@ -8,12 +8,12 @@ public class PlatformerMovement : MonoBehaviour
     public float maxSpeed;
 
     [Header("Jump")]
+    public int jumpsCount;
     public float jumpForce;
-    public float timeBeforeNotGrounded;
     float jumpCooldown = .05f;
+    bool jumpPressed;
     bool readyToJump;
-    bool canJump;
-    float lastGrounded;
+    bool grounded;
 
     [Header("Ground Check")]
     public Transform castPos;
@@ -47,13 +47,18 @@ public class PlatformerMovement : MonoBehaviour
             rb.velocity = new Vector2(0, vel.y);
 
         //Jump
-        if (Input.GetButton("Jump"))
-            Jump();
+        if (Input.GetButtonDown("Jump"))
+            jumpPressed = true;
     }
 
     private void FixedUpdate()
     {
         Move();
+        if(jumpPressed)
+        {
+            jumpPressed = false;
+            Jump();
+        }
     }
 
     void Move()
@@ -92,7 +97,7 @@ public class PlatformerMovement : MonoBehaviour
 
     void CounterMove()
     {
-        if (!canJump) { return; }
+        if (!grounded) { return; }
 
         if (Mathf.Abs(inputX) < threshold && Mathf.Abs(rb.velocity.x) > threshold)
         {
@@ -104,11 +109,12 @@ public class PlatformerMovement : MonoBehaviour
 
     private void Jump()
     {
-        if(canJump && readyToJump)
+        if(readyToJump && jumpsCount > 0)
         {
             //Set Y-Velocity to zero as to have consistant jumps
             rb.velocity = new Vector2(vel.x, 0);
 
+            jumpsCount--;
             readyToJump = false;
             rb.AddForce(Vector2.up * jumpForce);
             Invoke(nameof(ResetJump), jumpCooldown);
@@ -125,15 +131,11 @@ public class PlatformerMovement : MonoBehaviour
         bool touchingGround = Physics2D.OverlapCircle(castPos.position, castRadius, castMask);
         animator.SetBool("Jumping", !touchingGround); //Set Animator "Jump" Status
 
-        //This allows for the ability to jump a little after not touching ground
-        if (touchingGround)
-            lastGrounded = 0;
-        else lastGrounded += Time.deltaTime;
-
-        if(lastGrounded < timeBeforeNotGrounded)
+        if(touchingGround)
         {
-            canJump = true;
+            jumpsCount = 2;
+            grounded = true;
         }
-        else canJump = false;
+        else grounded = false;
     }
 }

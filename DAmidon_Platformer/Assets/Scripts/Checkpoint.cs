@@ -6,12 +6,24 @@ public class Checkpoint : MonoBehaviour
     public Color unclaimedColor, claimedColor;
     public ParticleSystem collectParticles;
     public bool claimed;
+    public bool lastClaimed;
     public int id;
 
     private void Start()
     {
+        lastClaimed = claimed;
         levelManager = FindObjectOfType<LevelManager>();
         GetComponent<SpriteRenderer>().color = unclaimedColor;
+    }
+
+    private void Update()
+    {
+        if (lastClaimed != claimed) 
+        {
+            lastClaimed = claimed;
+            collectParticles.Play();
+            GetComponent<SpriteRenderer>().color = claimedColor;
+        }
     }
 
     void ClaimPoint()
