@@ -11,6 +11,7 @@ public class PlatformerMovement : MonoBehaviour
     public int jumpsCount;
     public float jumpForce;
     float jumpCooldown = .05f;
+    public GameObject jumpParticle;
     bool jumpPressed;
     bool readyToJump;
     bool grounded;
@@ -39,6 +40,7 @@ public class PlatformerMovement : MonoBehaviour
     void Update()
     {
         CheckGrounded();
+        RotateTowardVel();
 
         vel = rb.velocity; //Set vel variable
 
@@ -49,6 +51,40 @@ public class PlatformerMovement : MonoBehaviour
         //Jump
         if (Input.GetButtonDown("Jump"))
             jumpPressed = true;
+    }
+
+    void RotateTowardVel()
+    {
+        if(grounded)
+        {
+            sprite.flipY = false;
+
+            if (inputX == -1)
+                sprite.flipX = true;
+            else if (inputX == 1)
+                sprite.flipX = false;
+
+            sprite.transform.rotation = Quaternion.Euler(0, 0, 0);
+        }
+        else
+        {
+            //Rotate
+            Vector2 rbNorm = rb.velocity.normalized;
+            float angle = Mathf.Atan2(rbNorm.y, rbNorm.x) * Mathf.Rad2Deg;
+            Quaternion desRot = Quaternion.Euler(0, 0, angle);
+            sprite.transform.rotation = Quaternion.Lerp(sprite.transform.rotation, desRot, 25 * Time.deltaTime);
+
+            if (dir < 0)
+            {
+                sprite.flipX = false;
+                sprite.flipY = true;
+            }
+            else
+            {
+                sprite.flipX = false;
+                sprite.flipY = false;
+            }
+        }
     }
 
     private void FixedUpdate()
@@ -74,14 +110,9 @@ public class PlatformerMovement : MonoBehaviour
         dir = (vel.x > 0) ? 1 : -1;
 
         //Animation
-        if (Mathf.Abs(inputX) > threshold)
+        if (Mathf.Abs(inputX) > 0)
             animator.SetBool("Moving", true);
         else animator.SetBool("Moving", false);
-
-        if (inputX == -1)
-            sprite.flipX = true;
-        else if (inputX == 1)
-            sprite.flipX = false;
 
         //Calculate force
         if (Mathf.Abs(vel.x) > maxSpeed)
@@ -114,6 +145,8 @@ public class PlatformerMovement : MonoBehaviour
             //Set Y-Velocity to zero as to have consistant jumps
             rb.velocity = new Vector2(vel.x, 0);
 
+            Destroy(Instantiate(jumpParticle, castPos.position, Quaternion.identity), 1f);
+
             jumpsCount--;
             readyToJump = false;
             rb.AddForce(Vector2.up * jumpForce);
@@ -128,7 +161,9 @@ public class PlatformerMovement : MonoBehaviour
 
     void CheckGrounded()
     {
-        bool touchingGround = Physics2D.OverlapCircle(castPos.position, castRadius, castMask);
+        Collider2D objectBelow = Physics2D.OverlapCircle(castPos.position, castRadius, castMask);
+        bool touchingGround = (objectBelow) ? true : false;
+
         animator.SetBool("Jumping", !touchingGround); //Set Animator "Jump" Status
 
         if(touchingGround)
@@ -137,5 +172,9 @@ public class PlatformerMovement : MonoBehaviour
             grounded = true;
         }
         else grounded = false;
+
+        if(objectBelow && objectBelow.CompareTag("Platform"))
+            transform.parent = objectBelow.transform;
+        else transform.parent = null;
     }
 }

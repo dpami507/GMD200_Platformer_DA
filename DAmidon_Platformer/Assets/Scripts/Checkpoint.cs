@@ -2,18 +2,19 @@ using UnityEngine;
 
 public class Checkpoint : MonoBehaviour
 {
+    Animator animator;
     LevelManager levelManager;
-    public Color unclaimedColor, claimedColor;
     public ParticleSystem collectParticles;
+    public GameObject flameLight;
     public bool claimed;
-    public bool lastClaimed;
+    bool lastClaimed;
     public int id;
 
     private void Start()
     {
         lastClaimed = claimed;
         levelManager = FindObjectOfType<LevelManager>();
-        GetComponent<SpriteRenderer>().color = unclaimedColor;
+        animator = GetComponent<Animator>();
     }
 
     private void Update()
@@ -22,8 +23,10 @@ public class Checkpoint : MonoBehaviour
         {
             lastClaimed = claimed;
             collectParticles.Play();
-            GetComponent<SpriteRenderer>().color = claimedColor;
         }
+
+        animator.SetBool("claimed", claimed);
+        flameLight.SetActive(claimed);
     }
 
     void ClaimPoint()
@@ -32,7 +35,6 @@ public class Checkpoint : MonoBehaviour
         {
             levelManager.SetCurrentCheckpoint(id);
             collectParticles.Play();
-            GetComponent<SpriteRenderer>().color = claimedColor;
         }
     }
 
