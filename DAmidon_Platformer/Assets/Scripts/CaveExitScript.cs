@@ -8,6 +8,7 @@ public class CaveExitScript : MonoBehaviour
 {
     [SerializeField] private Object nextscene;
     string sceneName;
+    public GameObject outline;
     BoxCollider2D checkCollider;
 
     bool canChangeScene;
@@ -24,6 +25,8 @@ public class CaveExitScript : MonoBehaviour
         Collider2D[] colliders = Physics2D.OverlapBoxAll(transform.position + (Vector3)checkCollider.offset, checkCollider.size, 0);
 
         canChangeScene = TagInArray(colliders, "Player");
+
+        outline.SetActive(canChangeScene);
 
         if(Input.GetKeyDown(KeyCode.E) && canChangeScene)
         {

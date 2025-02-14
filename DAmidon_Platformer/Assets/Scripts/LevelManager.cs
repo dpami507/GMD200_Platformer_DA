@@ -23,9 +23,12 @@ public class LevelManager : MonoBehaviour
     {
         Instance = this;
 
-        for (int i = 0; i < checkpoints.Length; i++)
+        if(checkpoints.Length > 0)
         {
-            checkpoints[i].id = i + 1;
+            for (int i = 0; i < checkpoints.Length; i++)
+            {
+                checkpoints[i].id = i + 1;
+            }
         }
     }
 
