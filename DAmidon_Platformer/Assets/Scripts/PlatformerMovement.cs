@@ -39,6 +39,7 @@ public class PlatformerMovement : MonoBehaviour
 
     void Update()
     {
+        GetInput();
         CheckGrounded();
         RotateTowardVel();
 
@@ -53,18 +54,24 @@ public class PlatformerMovement : MonoBehaviour
             jumpPressed = true;
     }
 
+    void GetInput()
+    {
+        //Get Input
+        inputX = Input.GetAxisRaw("Horizontal");
+    }
+
     void RotateTowardVel()
     {
         if(grounded)
         {
             sprite.flipY = false;
 
-            if (inputX == -1)
-                sprite.flipX = true;
-            else if (inputX == 1)
-                sprite.flipX = false;
-
-            sprite.transform.rotation = Quaternion.Euler(0, 0, 0);
+            if (dir < -threshold)
+                sprite.transform.rotation = Quaternion.Euler(0, 180, 0);
+            else if (dir > threshold)
+                sprite.transform.rotation = Quaternion.Euler(0, 0, 0);
+            else
+                sprite.transform.rotation = Quaternion.Euler(0, sprite.transform.eulerAngles.y, 0);
         }
         else
         {
@@ -75,15 +82,9 @@ public class PlatformerMovement : MonoBehaviour
             sprite.transform.rotation = Quaternion.Lerp(sprite.transform.rotation, desRot, 25 * Time.deltaTime);
 
             if (dir < 0)
-            {
-                sprite.flipX = false;
                 sprite.flipY = true;
-            }
             else
-            {
-                sprite.flipX = false;
                 sprite.flipY = false;
-            }
         }
     }
 
@@ -102,15 +103,16 @@ public class PlatformerMovement : MonoBehaviour
         //Extra Gravity
         rb.AddForce(Vector2.down * 10);
 
+        if (vel.x > 0)
+            dir = 1;
+        else if (vel.x < 0)
+            dir = -1;
+
         //Counter existing force
         CounterMove();
 
-        //Get Input
-        inputX = Input.GetAxisRaw("Horizontal");
-        dir = (vel.x > 0) ? 1 : -1;
-
         //Animation
-        if (Mathf.Abs(inputX) > 0)
+        if (Mathf.Abs(inputX) > threshold)
             animator.SetBool("Moving", true);
         else animator.SetBool("Moving", false);
 
@@ -134,6 +136,7 @@ public class PlatformerMovement : MonoBehaviour
         {
             //Counter
             Vector2 counterVector = new Vector2(moveForce * -dir * Time.deltaTime * counterMovement, 0);
+            Debug.Log($"Adding force: {counterVector}");
             rb.AddForce(counterVector);
         }
     }

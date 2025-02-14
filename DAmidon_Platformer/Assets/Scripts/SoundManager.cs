@@ -7,10 +7,27 @@ public class SoundManager : MonoBehaviour
     [SerializeField] GameObject source;
 
     public static SoundManager instance;
+    public AudioSource atmosphere;
+
+    [Range(0, 1)] public float masterVolume;
+
+    private void Awake()
+    {
+        if(instance == null)
+        {
+            instance = this;
+            DontDestroyOnLoad(gameObject);
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
+    }
 
     private void Start()
     {
-        instance = this;
+        atmosphere.Play();
+        atmosphere.volume = 0.025f * masterVolume;
     }
 
     public void PlaySound(string soundName)

@@ -4,8 +4,12 @@ public class Checkpoint : MonoBehaviour
 {
     Animator animator;
     LevelManager levelManager;
+
     public ParticleSystem collectParticles;
     public GameObject flameLight;
+    public AudioSource fireStart;
+    public AudioSource fireCrackle;
+
     public bool claimed;
     bool lastClaimed;
     public int id;
@@ -23,6 +27,8 @@ public class Checkpoint : MonoBehaviour
         {
             lastClaimed = claimed;
             collectParticles.Play();
+            fireStart.Play();
+            fireCrackle.Play();
         }
 
         animator.SetBool("claimed", claimed);
