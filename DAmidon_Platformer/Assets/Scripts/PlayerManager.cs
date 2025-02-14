@@ -4,6 +4,7 @@ public class PlayerManager : MonoBehaviour
 {
     LevelManager levelManager;
 
+
     private void Start()
     {
         levelManager = FindObjectOfType<LevelManager>();

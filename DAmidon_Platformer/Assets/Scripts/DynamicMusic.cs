@@ -38,19 +38,22 @@ public class DynamicMusic : MonoBehaviour
     {
         foreach(InstrumentGroup group in instrumentGroups)
         {
+            //Select random instrument per group
             int randomInstrument = UnityEngine.Random.Range(0, group.instruments.Length);
             Instrument selectedInstrument = group.instruments[randomInstrument];
 
-            //Rando Clip
+            //Random Clip on selected instrument
             int randomClip = UnityEngine.Random.Range(0, selectedInstrument.instrumentClips.Length);
 
+            //Play selected group:instrument:clip if exists
             if (selectedInstrument.instrumentClips[randomClip] != null)
             {
+                //Create object as the clip needs time to taper off.
                 AudioSource _source = Instantiate(source, transform.position, Quaternion.identity).GetComponent<AudioSource>();
 
                 _source.clip = selectedInstrument.instrumentClips[randomClip];
                 _source.volume = SoundManager.instance.masterVolume * selectedInstrument.instrumentVolume;
-                _source.name = $"{group.groupName}: {_source.clip.name}";
+                _source.name = $"{group.groupName}: {selectedInstrument.instrumentName}_{randomClip}";
 
                 DontDestroyOnLoad(_source.gameObject);
                 Destroy(_source.gameObject, _source.clip.length);

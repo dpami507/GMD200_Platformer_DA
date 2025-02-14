@@ -2,28 +2,20 @@ using UnityEngine;
 
 public class PlatformerMovement : MonoBehaviour
 {
-    [Header("Movement")]
-    public float moveForce;
-    public float counterMovement;
-    public float maxSpeed;
+    public PlayerSettings playerSettings;
 
-    [Header("Jump")]
-    public int jumpsCount;
-    public float jumpForce;
     float jumpCooldown = .05f;
-    public GameObject jumpParticle;
+    int jumpsLeft;
     bool jumpPressed;
     bool readyToJump;
     bool grounded;
 
     [Header("Ground Check")]
     public Transform castPos;
-    public float castRadius;
-    public LayerMask castMask;
 
     [Header("Animation")]
     public SpriteRenderer sprite;
-    public Animator animator;
+    Animator animator;
 
     float inputX;
     float threshold = 0.05f;
@@ -33,6 +25,7 @@ public class PlatformerMovement : MonoBehaviour
 
     void Start()
     {
+        animator = GetComponentInChildren<Animator>();  
         rb = GetComponent<Rigidbody2D>();   
         readyToJump = true;
     }
@@ -75,16 +68,16 @@ public class PlatformerMovement : MonoBehaviour
         }
         else
         {
+            if (dir < 0)
+                sprite.flipY = true;
+            else
+                sprite.flipY = false;
+
             //Rotate
             Vector2 rbNorm = rb.velocity.normalized;
             float angle = Mathf.Atan2(rbNorm.y, rbNorm.x) * Mathf.Rad2Deg;
             Quaternion desRot = Quaternion.Euler(0, 0, angle);
             sprite.transform.rotation = Quaternion.Lerp(sprite.transform.rotation, desRot, 25 * Time.deltaTime);
-
-            if (dir < 0)
-                sprite.flipY = true;
-            else
-                sprite.flipY = false;
         }
     }
 
@@ -112,16 +105,14 @@ public class PlatformerMovement : MonoBehaviour
         CounterMove();
 
         //Animation
-        if (Mathf.Abs(inputX) > threshold)
-            animator.SetBool("Moving", true);
-        else animator.SetBool("Moving", false);
+        animator.SetBool("Moving", (Mathf.Abs(inputX) > threshold));
 
         //Calculate force
-        if (Mathf.Abs(vel.x) > maxSpeed)
+        if (Mathf.Abs(vel.x) > playerSettings.maxSpeed)
             if (inputX == dir)
                 inputX = 0; //If velocity is greater than max speed set to zero
 
-        float forceToAdd = inputX * moveForce * Time.deltaTime;
+        float forceToAdd = inputX * playerSettings.moveForce * Time.deltaTime;
 
         //Add force
         Vector2 moveVector = new Vector2(forceToAdd, 0);
@@ -135,7 +126,7 @@ public class PlatformerMovement : MonoBehaviour
         if (Mathf.Abs(inputX) < threshold && Mathf.Abs(rb.velocity.x) > threshold)
         {
             //Counter
-            Vector2 counterVector = new Vector2(moveForce * -dir * Time.deltaTime * counterMovement, 0);
+            Vector2 counterVector = new Vector2(playerSettings.moveForce * -dir * Time.deltaTime * playerSettings.counterMovement, 0);
             Debug.Log($"Adding force: {counterVector}");
             rb.AddForce(counterVector);
         }
@@ -143,18 +134,21 @@ public class PlatformerMovement : MonoBehaviour
 
     private void Jump()
     {
-        if(readyToJump && jumpsCount > 0)
+        if (readyToJump && jumpsLeft > 0)
         {
             //Set Y-Velocity to zero as to have consistant jumps
             rb.velocity = new Vector2(vel.x, 0);
 
-            Destroy(Instantiate(jumpParticle, castPos.position, Quaternion.identity), 1f);
-
-            jumpsCount--;
+            jumpsLeft--;
             readyToJump = false;
-            rb.AddForce(Vector2.up * jumpForce);
+            rb.AddForce(Vector2.up * playerSettings.jumpForce);
             Invoke(nameof(ResetJump), jumpCooldown);
+
+            if (!grounded)
+                Destroy(Instantiate(playerSettings.jumpParticle, castPos.position, Quaternion.identity), 1f);
         }
+        else
+            Debug.Log($"Cant Jump: {jumpsLeft} || {readyToJump}");
     }
 
     void ResetJump()
@@ -164,14 +158,14 @@ public class PlatformerMovement : MonoBehaviour
 
     void CheckGrounded()
     {
-        Collider2D objectBelow = Physics2D.OverlapCircle(castPos.position, castRadius, castMask);
+        Collider2D objectBelow = Physics2D.OverlapCircle(castPos.position, playerSettings.castRadius, playerSettings.castMask);
         bool touchingGround = (objectBelow) ? true : false;
 
         animator.SetBool("Jumping", !touchingGround); //Set Animator "Jump" Status
 
-        if(touchingGround)
+        if(touchingGround && readyToJump)
         {
-            jumpsCount = 2;
+            jumpsLeft = playerSettings.jumpsCount;
             grounded = true;
         }
         else grounded = false;
