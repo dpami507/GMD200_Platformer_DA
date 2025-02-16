@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Sign : MonoBehaviour
+public class Sign : PlayerInteractable
 {
     public bool playerOverSign;
     public GameObject signText;
@@ -16,23 +16,10 @@ public class Sign : MonoBehaviour
 
     private void Update()
     {
-        Collider2D[] colliders = Physics2D.OverlapBoxAll(transform.position + (Vector3)checkCollider.offset, checkCollider.size, 0);
+        Collider2D[] colliders = GetCollidersInBox(transform.position + (Vector3)checkCollider.offset, checkCollider.size);
 
         playerOverSign = TagInArray(colliders, "Player");
 
         signText.SetActive(playerOverSign);
-    }
-
-    bool TagInArray(Collider2D[] array, string tag)
-    {
-        foreach (var collider in array)
-        {
-            if (collider.CompareTag(tag))
-            {
-                return true;
-            }
-        }
-
-        return false;
     }
 }

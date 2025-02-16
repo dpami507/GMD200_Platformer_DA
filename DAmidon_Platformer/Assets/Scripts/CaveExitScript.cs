@@ -4,7 +4,7 @@ using UnityEditor;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-public class CaveExitScript : MonoBehaviour
+public class CaveExitScript : PlayerInteractable
 {
     [SerializeField] private Object nextscene;
     string sceneName;
@@ -22,7 +22,7 @@ public class CaveExitScript : MonoBehaviour
 
     private void Update()
     {
-        Collider2D[] colliders = Physics2D.OverlapBoxAll(transform.position + (Vector3)checkCollider.offset, checkCollider.size, 0);
+        Collider2D[] colliders = GetCollidersInBox(transform.position + (Vector3)checkCollider.offset, checkCollider.size);
 
         canChangeScene = TagInArray(colliders, "Player");
 
@@ -32,18 +32,5 @@ public class CaveExitScript : MonoBehaviour
         {
             SceneLoader.Instance.LoadNextScene(sceneName);
         }
-    }
-
-    bool TagInArray(Collider2D[] array, string tag)
-    {
-        foreach (var collider in array)
-        {
-            if (collider.CompareTag(tag))
-            {
-                return true;
-            }
-        }
-
-        return false;
     }
 }

@@ -1,14 +1,15 @@
 using UnityEngine;
+using UnityEngine.Rendering.Universal;
 
 public class CameraFollow : MonoBehaviour
 {
     public Transform target;
-    public Vector3 offset;
-    public float lerpSpeed;
+    public CameraSettings settings;
 
     private void FixedUpdate()
     {
-        Vector3 desiredPos = target.position + offset + ((Vector3)target.GetComponent<Rigidbody2D>().velocity / 8);
-        transform.position = Vector3.Lerp(transform.position, desiredPos, lerpSpeed * Time.deltaTime);
+
+        Vector3 desiredPos = target.position + settings.offset + ((Vector3)target.GetComponent<Rigidbody2D>().velocity / 8);
+        transform.position = Vector3.Lerp(transform.position, desiredPos, settings.lerpSpeed * Time.deltaTime);
     }
 }

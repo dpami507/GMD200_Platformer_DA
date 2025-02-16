@@ -4,7 +4,7 @@ using UnityEngine;
 public class SoundManager : MonoBehaviour
 {
     [SerializeField] Sound[] sounds;
-    [SerializeField] GameObject source;
+    public GameObject source;
 
     public static SoundManager instance;
     public AudioSource atmosphere;
@@ -49,12 +49,16 @@ public class SoundManager : MonoBehaviour
                 float pitch = Random.Range(sound.pitch.x, sound.pitch.y);
                 audioSource.pitch = pitch;
 
+                Debug.Log($"Playing sound: {soundName}");
                 audioSource.Play();
 
                 //Cleanup
-                Destroy(source_, sound.length);
+                Destroy(source_, sound.clip.length);
+                return;
             }
         }
+
+        Debug.Log($"Couldn't play sound: {soundName} as it doesn't exist");
     }
 }
 
@@ -65,6 +69,5 @@ public class Sound
     public string name;
     public AudioClip clip;
     public float volume;
-    public float length;
     public Vector2 pitch;
 }

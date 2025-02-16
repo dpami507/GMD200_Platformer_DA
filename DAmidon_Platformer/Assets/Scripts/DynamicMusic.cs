@@ -13,8 +13,6 @@ public class DynamicMusic : MonoBehaviour
     float lastStarted;
     float bps;
 
-    public GameObject source;
-
     public InstrumentGroup[] instrumentGroups;
 
     private void Start()
@@ -49,7 +47,7 @@ public class DynamicMusic : MonoBehaviour
             if (selectedInstrument.instrumentClips[randomClip] != null)
             {
                 //Create object as the clip needs time to taper off.
-                AudioSource _source = Instantiate(source, transform.position, Quaternion.identity).GetComponent<AudioSource>();
+                AudioSource _source = Instantiate(SoundManager.instance.source, transform.position, Quaternion.identity).GetComponent<AudioSource>();
 
                 _source.clip = selectedInstrument.instrumentClips[randomClip];
                 _source.volume = SoundManager.instance.masterVolume * selectedInstrument.instrumentVolume;

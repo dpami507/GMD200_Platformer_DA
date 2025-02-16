@@ -11,6 +11,7 @@ public class Fish : MonoBehaviour
         if(collision.CompareTag("Player"))
         {
             ScoreManager.instance.score++;
+            SoundManager.instance.PlaySound("Collect");
             Destroy(Instantiate(fishExplosion, transform.position, Quaternion.identity), 2f);
             Destroy(this.gameObject);
         }

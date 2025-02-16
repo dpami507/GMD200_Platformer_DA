@@ -1,14 +1,9 @@
 using UnityEngine;
+using UnityEngine.Rendering.Universal;
 
 public class PlatformerMovement : MonoBehaviour
 {
     public PlayerSettings playerSettings;
-
-    float jumpCooldown = .05f;
-    int jumpsLeft;
-    bool jumpPressed;
-    bool readyToJump;
-    bool grounded;
 
     [Header("Ground Check")]
     public Transform castPos;
@@ -17,14 +12,27 @@ public class PlatformerMovement : MonoBehaviour
     public SpriteRenderer sprite;
     Animator animator;
 
+    //Private Jump Variables
+    float jumpCooldown = .05f;
+    int jumpsLeft;
+    bool jumpPressed;
+    bool readyToJump;
+    bool grounded;
+
+    //Private Movement Variables
     float inputX;
-    float threshold = 0.05f;
     float dir;
-    Rigidbody2D rb;
+    float threshold = 0.05f;
     Vector2 vel;
+
+    //Other
+    PlayerManager playerManager;
+    Rigidbody2D rb;
+    float afkTime;
 
     void Start()
     {
+        playerManager = GetComponent<PlayerManager>();
         animator = GetComponentInChildren<Animator>();  
         rb = GetComponent<Rigidbody2D>();   
         readyToJump = true;
@@ -32,9 +40,16 @@ public class PlatformerMovement : MonoBehaviour
 
     void Update()
     {
-        GetInput();
+        //Death Check
+        if(!playerManager.dead)
+            GetInput();
+        else rb.velocity = Vector2.zero;
+
+        sprite.gameObject.SetActive(!playerManager.dead);
+
         CheckGrounded();
         RotateTowardVel();
+        CheckIfAFK();
 
         vel = rb.velocity; //Set vel variable
 
@@ -127,7 +142,6 @@ public class PlatformerMovement : MonoBehaviour
         {
             //Counter
             Vector2 counterVector = new Vector2(playerSettings.moveForce * -dir * Time.deltaTime * playerSettings.counterMovement, 0);
-            Debug.Log($"Adding force: {counterVector}");
             rb.AddForce(counterVector);
         }
     }
@@ -147,8 +161,6 @@ public class PlatformerMovement : MonoBehaviour
             if (!grounded)
                 Destroy(Instantiate(playerSettings.jumpParticle, castPos.position, Quaternion.identity), 1f);
         }
-        else
-            Debug.Log($"Cant Jump: {jumpsLeft} || {readyToJump}");
     }
 
     void ResetJump()
@@ -170,8 +182,19 @@ public class PlatformerMovement : MonoBehaviour
         }
         else grounded = false;
 
+        //If object below is platform parent to move with it
         if(objectBelow && objectBelow.CompareTag("Platform"))
             transform.parent = objectBelow.transform;
         else transform.parent = null;
+    }
+
+    //Plays AFK animation
+    void CheckIfAFK()
+    {
+        afkTime += Time.deltaTime;
+        if (vel.magnitude > threshold)
+            afkTime = 0;
+
+        animator.SetBool("Idling", (afkTime > playerSettings.afkTimeSeconds));
     }
 }
