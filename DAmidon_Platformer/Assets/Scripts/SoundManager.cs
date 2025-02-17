@@ -11,23 +11,11 @@ public class SoundManager : MonoBehaviour
 
     [Range(0, 1)] public float masterVolume;
 
-    private void Awake()
-    {
-        if(instance == null)
-        {
-            instance = this;
-            DontDestroyOnLoad(gameObject);
-        }
-        else
-        {
-            Destroy(gameObject);
-        }
-    }
-
     private void Start()
     {
         atmosphere.Play();
         atmosphere.volume = 0.025f * masterVolume;
+        instance = this;
     }
 
     public void PlaySound(string soundName)
