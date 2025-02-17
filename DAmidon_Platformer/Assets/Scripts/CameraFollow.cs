@@ -3,8 +3,13 @@ using UnityEngine.Rendering.Universal;
 
 public class CameraFollow : MonoBehaviour
 {
-    public Transform target;
+    Transform target;
     public CameraSettings settings;
+
+    private void Start()
+    {
+        target = FindFirstObjectByType<PlayerManager>().transform;
+    }
 
     private void FixedUpdate()
     {
