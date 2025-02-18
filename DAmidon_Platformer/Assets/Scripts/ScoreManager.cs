@@ -9,6 +9,11 @@ public class ScoreManager : MonoBehaviour
     public TMP_Text scoreText;
     public int score;
 
+    private void Awake()
+    {
+        instance = this;
+    }
+
     private void Update()
     {
         scoreText.text = $"Fish Count {score}";
