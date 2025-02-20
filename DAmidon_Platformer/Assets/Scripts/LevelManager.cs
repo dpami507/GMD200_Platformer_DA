@@ -30,6 +30,9 @@ public class LevelManager : MonoBehaviour
                 checkpoints[i].id = i + 1;
             }
         }
+
+        if(checkpoints.Length > 0)
+            mostRecentCheckPoint = checkpoints[0].transform.position;
     }
 
     public void SetCurrentCheckpoint(int id)
