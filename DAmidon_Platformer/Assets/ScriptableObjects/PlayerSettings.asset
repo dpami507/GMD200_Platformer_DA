@@ -22,4 +22,4 @@ MonoBehaviour:
   castMask:
     serializedVersion: 2
     m_Bits: 8
-  afkTimeSeconds: 1
+  afkTimeSeconds: 2
