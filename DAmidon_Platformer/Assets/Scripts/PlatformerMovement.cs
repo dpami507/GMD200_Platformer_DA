@@ -1,5 +1,4 @@
 using UnityEngine;
-using UnityEngine.Rendering.Universal;
 
 public class PlatformerMovement : MonoBehaviour
 {
@@ -45,6 +44,7 @@ public class PlatformerMovement : MonoBehaviour
             GetInput();
         else rb.velocity = Vector2.zero;
 
+        //Turn off sprite if dead
         sprite.gameObject.SetActive(!playerManager.dead);
 
         CheckGrounded();
@@ -170,6 +170,7 @@ public class PlatformerMovement : MonoBehaviour
 
     void CheckGrounded()
     {
+        //Get object below for groundCheck and future use
         Collider2D objectBelow = Physics2D.OverlapCircle(castPos.position, playerSettings.castRadius, playerSettings.castMask);
         bool touchingGround = (objectBelow) ? true : false;
 

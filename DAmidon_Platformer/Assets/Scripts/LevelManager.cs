@@ -1,7 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using TMPro;
 
 public class LevelManager : MonoBehaviour
 {
@@ -29,14 +28,16 @@ public class LevelManager : MonoBehaviour
             {
                 checkpoints[i].id = i + 1;
             }
-        }
 
-        if(checkpoints.Length > 0)
+            //Set checkpoint to first when starting
             mostRecentCheckPoint = checkpoints[0].transform.position;
+        }
     }
 
+    //Claim point
     public void SetCurrentCheckpoint(int id)
     {
+        //Loop though to make sure all prior points are claimed
         for (int i = 0; i < id; i++)
         {
             Debug.Log($"Claimed point {id}");

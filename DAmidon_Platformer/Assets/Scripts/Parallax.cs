@@ -1,9 +1,8 @@
-using JetBrains.Annotations;
 using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics.Tracing;
 using UnityEngine;
 
+//Credit Dani - YouTube : https://www.youtube.com/watch?v=zit45k6CUMk
 public class Parallax : MonoBehaviour
 {
     float length, startPos;

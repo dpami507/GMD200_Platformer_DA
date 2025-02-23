@@ -23,6 +23,7 @@ public class Checkpoint : MonoBehaviour
 
     private void Update()
     {
+        //if claimed changes play style features
         if (lastClaimed != claimed) 
         {
             lastClaimed = claimed;
@@ -37,6 +38,7 @@ public class Checkpoint : MonoBehaviour
 
     void ClaimPoint()
     {
+        //claim checkpoint and update level manager
         if(!claimed)
         {
             levelManager.SetCurrentCheckpoint(id);

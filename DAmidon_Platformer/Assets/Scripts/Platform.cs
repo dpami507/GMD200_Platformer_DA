@@ -12,8 +12,12 @@ public class Platform : MonoBehaviour
 
     private void FixedUpdate()
     {
+        //Create Sin (0-1) based on speed
         float t = (Mathf.Sin(Time.time * moveSpeed) + 1) / 2;
-        Vector2 currentPos = new Vector2(pos1.position.x - (pos1.position.x - pos2.position.x) * t, pos1.position.y - (pos1.position.y - pos2.position.y) * t);
+
+        //OMG USE ONE OF YOUR CLASSES!!!!!!!!! (Parametric Equations)
+        Vector2 vector = pos2.position - pos1.position;
+        Vector2 currentPos = new Vector2(pos1.position.x + (vector.x * t), pos1.position.y + (vector.y * t));
         platform.transform.position = currentPos;
     }
 }

@@ -16,10 +16,13 @@ public class Sign : PlayerInteractable
 
     private void Update()
     {
+        //get colliders
         Collider2D[] colliders = GetCollidersInBox(transform.position + (Vector3)checkCollider.offset, checkCollider.size);
 
+        //is a collider player
         playerOverSign = TagInArray(colliders, "Player");
 
+        //set text active
         signText.SetActive(playerOverSign);
     }
 }

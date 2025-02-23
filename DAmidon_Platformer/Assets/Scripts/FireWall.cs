@@ -1,7 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
 
 public class FireWall : PlayerInteractable
 {
@@ -30,13 +29,17 @@ public class FireWall : PlayerInteractable
 
     private void Update()
     {
+        //Get all colliders in area
         Collider2D[] colliders = GetCollidersInBox((Vector2)leverPos.position + leverCollider.offset, leverCollider.size);
 
+        //check if player
         canFlipLever = TagInArray(colliders, "Player");
 
+        //if not flipped and player in area activate outline
         if (leverFlipped == false)
             leverOutline.SetActive(canFlipLever);
 
+        //User input
         if (Input.GetKeyDown(KeyCode.E) && canFlipLever)
         {
             FlipLeverOff();

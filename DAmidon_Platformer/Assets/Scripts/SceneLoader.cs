@@ -25,14 +25,19 @@ public class SceneLoader : MonoBehaviour
 
     IEnumerator LoadScene(string scene)
     {
+        //Play cover
         animator.SetTrigger("Start");
 
+        //Wait
         yield return new WaitForSeconds(transitionTime);
 
+        //Load
         SceneManager.LoadScene(scene);
 
+        //Wait
         yield return new WaitForSeconds(transitionTime / 2);
 
+        //Play reveal
         animator.SetTrigger("End");
     }
 }

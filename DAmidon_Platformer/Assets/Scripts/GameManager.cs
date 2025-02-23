@@ -7,11 +7,11 @@ using UnityEngine.UI;
 
 public class GameManager : MonoBehaviour
 {
+    public static GameManager instance;
+
     public SoundManager soundManager;
     public Light2D globablLight;
     public GameObject globalLightPrefab;
-
-    public static GameManager instance;
 
     [Header("Settings")]
     public GameObject settingsPage;
@@ -25,6 +25,7 @@ public class GameManager : MonoBehaviour
 
     private void Awake()
     {
+        //Set up instance and DontDestroyOnLoad
         if (instance == null)
         {
             instance = this;
@@ -45,11 +46,13 @@ public class GameManager : MonoBehaviour
 
     private void Update()
     {
+        //Update Settings values
         volume = volumeSlider.value / 100f;
         volumeText.text = volumeSlider.value.ToString();
         lightStrength = brightnessSlider.value / 100f;
         brightnessText.text = brightnessSlider.value.ToString();
 
+        //Update light and volume based on settings
         globablLight.intensity = lightStrength;
         soundManager.masterVolume = volume;
     }

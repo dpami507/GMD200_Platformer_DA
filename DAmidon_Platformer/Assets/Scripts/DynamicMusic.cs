@@ -17,13 +17,19 @@ public class DynamicMusic : MonoBehaviour
 
     private void Start()
     {
+        //Get beats per second
         bps = bpm / 60f;
+
+        //get length of segment
         segmentLength = bps * barsPerSegment * beatsPerBar;
+
+        //Start song
         lastStarted = segmentLength - startDelay;
     }
 
     private void Update()
     {
+        //loop through random segments
         lastStarted += Time.deltaTime;
         if(lastStarted > segmentLength)
         {
@@ -49,11 +55,13 @@ public class DynamicMusic : MonoBehaviour
                 //Create object as the clip needs time to taper off.
                 AudioSource _source = Instantiate(SoundManager.instance.source, transform.position, Quaternion.identity).GetComponent<AudioSource>();
 
+                //Set up clip
                 _source.clip = selectedInstrument.instrumentClips[randomClip];
                 _source.volume = SoundManager.instance.masterVolume * selectedInstrument.instrumentVolume;
                 _source.name = $"{group.groupName}: {selectedInstrument.instrumentName}_{randomClip}";
 
-                DontDestroyOnLoad(_source.gameObject);
+                //Play
+                DontDestroyOnLoad(_source.gameObject); //Doesn't cause breaks when scene load
                 Destroy(_source.gameObject, _source.clip.length);
                 _source.Play();
             }

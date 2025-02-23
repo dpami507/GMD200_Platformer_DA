@@ -12,12 +12,12 @@ public class PlayerManager : MonoBehaviour
 
     public void Die()
     {
-        Invoke(nameof(LateDie), 1f);
+        Invoke(nameof(WaitDie), 1f);
         SoundManager.instance.PlaySound("Death");
         dead = true;
     }
 
-    public void LateDie()
+    public void WaitDie()
     {
         transform.position = levelManager.mostRecentCheckPoint;
         dead = false;
