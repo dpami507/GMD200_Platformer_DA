@@ -21,7 +21,7 @@ public class PlatformerMovement : MonoBehaviour
     //Private Movement Variables
     float inputX;
     float dir;
-    float threshold = 0.05f;
+    float threshold = 0.01f;
     Vector2 vel;
 
     //Other
@@ -35,6 +35,8 @@ public class PlatformerMovement : MonoBehaviour
         animator = GetComponentInChildren<Animator>();  
         rb = GetComponent<Rigidbody2D>();   
         readyToJump = true;
+        sprite.transform.rotation = Quaternion.Euler(0, 0, 0);
+        dir = 1;
     }
 
     void Update()
@@ -78,8 +80,6 @@ public class PlatformerMovement : MonoBehaviour
                 sprite.transform.rotation = Quaternion.Euler(0, 180, 0);
             else if (dir > threshold)
                 sprite.transform.rotation = Quaternion.Euler(0, 0, 0);
-            else
-                sprite.transform.rotation = Quaternion.Euler(0, sprite.transform.eulerAngles.y, 0);
         }
         else
         {
@@ -111,9 +111,9 @@ public class PlatformerMovement : MonoBehaviour
         //Extra Gravity
         rb.AddForce(Vector2.down * 10);
 
-        if (vel.x > 0)
+        if (vel.x > threshold)
             dir = 1;
-        else if (vel.x < 0)
+        else if (vel.x < -threshold)
             dir = -1;
 
         //Counter existing force
