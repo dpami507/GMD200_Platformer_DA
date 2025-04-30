@@ -6,8 +6,7 @@ using UnityEngine.SceneManagement;
 
 public class CaveExitScript : PlayerInteractable
 {
-    [SerializeField] private Object nextscene;
-    string sceneName;
+    [SerializeField] string sceneName;
     public GameObject outline;
     BoxCollider2D checkCollider;
 
@@ -15,10 +14,6 @@ public class CaveExitScript : PlayerInteractable
 
     private void Start()
     {
-        //Allows for scene to be drag and dropped into object
-        sceneName = AssetDatabase.GetAssetPath(nextscene);
-        sceneName = System.IO.Path.GetFileNameWithoutExtension(sceneName);
-
         checkCollider = GetComponent<BoxCollider2D>();
     }
 
