@@ -8,7 +8,7 @@ public class PlatformerMovement : MonoBehaviour
     public Transform castPos;
 
     [Header("Animation")]
-    public SpriteRenderer sprite;
+    [SerializeField] SpriteRenderer sprite;
     Animator animator;
 
     //Private Jump Variables
